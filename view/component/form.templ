@@ -1,0 +1,19 @@
+package component
+
+import (
+  "fmt"
+)
+
+type InputProps struct {
+  Typ string
+  Name string
+  Placeholder string
+  Validate string
+}
+
+templ Input(props InputProps) {
+  <div>
+    <input type={props.Typ} name={props.Name} placeholder={props.Placeholder} hx-swap="innerHTML" hx-target={ fmt.Sprintf("#%s", props.Name) } />
+    <div class="text-error" id={props.Name}></div>
+  </div>
+}

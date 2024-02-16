@@ -1,0 +1,18 @@
+package layout
+
+templ Base(page string) {
+  <!DOCTYPE html>
+  <html class="h-full">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link href="/css/output.css" rel="stylesheet"/>
+        <script src="/js/htmx.js"></script>
+        <script src="/js/alpine.js" defer></script>
+        <title>Tasai | { page }</title>
+    </head>
+    <body class="h-full">
+      { children... }
+    </body>
+  </html>
+}

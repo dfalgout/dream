@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"log/slog"
 	"strings"
@@ -47,7 +49,7 @@ func (s *userService) UpsertUserById(ctx context.Context, input *types.UpsertUse
 		VerifyExpiresAt: input.VerifyExpiresAt,
 	})
 	if err != nil {
-		if helpers.NoResultsError(err) {
+		if errors.Is(sql.ErrNoRows, err) {
 			foundUser, err = s.queries.CreateUser(ctx, &db.CreateUserParams{
 				ID:              cuid.New(),
 				Email:           checkedEmail,
@@ -81,7 +83,7 @@ func (s *userService) UpsertUserByEmail(ctx context.Context, input *types.Upsert
 		VerifyExpiresAt: input.VerifyExpiresAt,
 	})
 	if err != nil {
-		if helpers.NoResultsError(err) {
+		if errors.Is(sql.ErrNoRows, err) {
 			foundUser, err = s.queries.CreateUser(ctx, &db.CreateUserParams{
 				ID:              cuid.New(),
 				Email:           checkedEmail,

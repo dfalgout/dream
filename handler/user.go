@@ -1,6 +1,9 @@
 package handler
 
 import (
+	"database/sql"
+	"errors"
+	"github.com/dfalgout/dream/config"
 	"log/slog"
 	"net/http"
 	"time"
@@ -8,13 +11,8 @@ import (
 	"github.com/dfalgout/dream/helpers"
 	"github.com/dfalgout/dream/service"
 	"github.com/dfalgout/dream/types"
+	"github.com/dfalgout/dream/view/user"
 	"github.com/labstack/echo/v4"
-)
-
-const (
-	ACTION_SEND_CODE   = "/action/send-code"
-	ACTION_VERIFY_CODE = "/action/verify-code"
-	ACTION_USERS       = "/action/users"
 )
 
 type userHandlers struct {
@@ -28,13 +26,18 @@ func RegisterUserHandlers(e *echo.Echo, logger *slog.Logger, userService service
 		userService,
 	}
 	// register routes
-	e.POST(ACTION_SEND_CODE, h.sendCode)
-	e.POST(ACTION_VERIFY_CODE, h.verifyCode)
-	e.PATCH(ACTION_USERS, h.updateUser)
+	e.POST(config.ActionSendCode, h.sendCode)
+	e.POST(config.ActionVerifyCode, h.verifyCode)
+	e.PATCH(config.ActionUsers, h.updateUser)
+
+	e.GET(config.Onboarding, h.Onboarding)
+
+	e.GET(config.LoginPage, h.loginPage)
+	e.GET(config.Logout, h.logout)
 }
 
 type updateUserInput struct {
-	FullName *string `json:"fullName"`
+	FullName *string `form:"fullName"`
 }
 
 func (h *userHandlers) updateUser(c echo.Context) error {
@@ -56,7 +59,7 @@ func (h *userHandlers) updateUser(c echo.Context) error {
 }
 
 type sendCodeInput struct {
-	Email string `json:"email" validate:"required,email"`
+	Email string `form:"email" validate:"required,email"`
 }
 
 func (h *userHandlers) sendCode(c echo.Context) error {
@@ -69,12 +72,12 @@ func (h *userHandlers) sendCode(c echo.Context) error {
 		h.logger.Error("failed to send code", slog.Any("error", err))
 		return c.NoContent(http.StatusInternalServerError)
 	}
-	return c.NoContent(http.StatusOK)
+	return Render(c, user.Verify(input.Email))
 }
 
 type verifyCodeInput struct {
-	Email string `json:"email" validate:"required,email"`
-	Code  string `json:"code" validate:"required,len=6"`
+	Email string `form:"email" validate:"required,email"`
+	Code  string `form:"code" validate:"required,len=6"`
 }
 
 func (h *userHandlers) verifyCode(c echo.Context) error {
@@ -87,7 +90,11 @@ func (h *userHandlers) verifyCode(c echo.Context) error {
 		Code:  input.Code,
 	})
 	if err != nil {
-		h.logger.Error("failed to send code", slog.Any("error", err))
+		if errors.Is(err, sql.ErrNoRows) {
+			h.logger.Error("failed to send code", "err", err)
+			return c.NoContent(http.StatusPreconditionFailed)
+		}
+		h.logger.Error("failed to send code", "err", err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 	c.SetCookie(&http.Cookie{
@@ -98,7 +105,15 @@ func (h *userHandlers) verifyCode(c echo.Context) error {
 		Secure:   true,
 		SameSite: http.SameSiteLaxMode,
 	})
-	return c.NoContent(http.StatusOK)
+	return Navigate(c, config.Onboarding)
+}
+
+func (h *userHandlers) loginPage(c echo.Context) error {
+	return Render(c, user.Login())
+}
+
+func (h *userHandlers) Onboarding(c echo.Context) error {
+	return Render(c, user.OnboardingPage())
 }
 
 func (h *userHandlers) logout(c echo.Context) error {
@@ -110,5 +125,5 @@ func (h *userHandlers) logout(c echo.Context) error {
 		Secure:   true,
 		SameSite: http.SameSiteLaxMode,
 	})
-	return c.NoContent(http.StatusOK)
+	return Navigate(c, config.LoginPage)
 }
