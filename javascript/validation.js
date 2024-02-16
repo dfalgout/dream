@@ -12,7 +12,7 @@ export default (config = {}) => ({
                 rules: [],
                 message: '',
                 error: false,
-                touched: false
+                touched: false,
             }
             if (rules.includes(',')) {
                 const rulesArr = rules.split(',')
@@ -26,6 +26,15 @@ export default (config = {}) => ({
             }
             this.$watch(`fields.${field}.value`, (value) => this.validate(field, value))
         }
+    },
+    // maybe put this somewhere else so we don't have to loop and validate all inputs
+    // but for now it works
+    paste: {
+        ['@paste']() {
+            for (const field in this.fields) {
+                this.validate(field, this.fields[field].value)
+            }
+        },
     },
     must: {
         required: {

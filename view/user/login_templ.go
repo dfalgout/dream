@@ -12,6 +12,7 @@ import "bytes"
 
 import (
 	"github.com/dfalgout/dream/config"
+	"github.com/dfalgout/dream/view/component"
 	"github.com/dfalgout/dream/view/layout"
 )
 
@@ -34,7 +35,7 @@ func Login() templ.Component {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex h-full justify-center items-center\"><div class=\"card w-96 bg-neutral text-neutral-content\"><div class=\"card-body items-center text-center\"><h2 class=\"card-title\">Login</h2><form hx-post=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex h-full justify-center items-center\"><div class=\"card w-96 bg-neutral text-neutral-content\"><div class=\"card-body items-center text-center\"><h2 class=\"card-title mb-6\">Login</h2><form hx-post=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -42,7 +43,19 @@ func Login() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-swap=\"outerHTML\" x-data=\"validation({ email: &#39;email&#39; })\"><input class=\"input input-bordered w-full max-w-xs mb-6\" :class=\"fields.email.error ? &#39;input-error&#39; : &#39;&#39;\" type=\"email\" name=\"email\" placeholder=\"Email\" x-model=\"fields.email.value\"><template x-if=\"fields.email.error\"><div class=\"flex pl-1 -mt-6 text-error\" x-text=\"fields.email.message\"></div></template><div class=\"card-actions justify-end\"><button type=\"submit\" class=\"btn btn-primary disabled:opacity-95\" :disabled=\"!valid\">Send Code<template class=\"htmx-indicator\"><span class=\"loading loading-dots loading-xs\"></span></template></button></div></form></div></div></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-swap=\"outerHTML\" x-data=\"validation({ email: &#39;email&#39; })\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = component.InputWithValidation(component.InputWithValidationProps{
+				Name:        "email",
+				Typ:         "email",
+				Placeholder: "john@doe.com",
+			}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"card-actions justify-end\"><button type=\"submit\" class=\"btn btn-primary disabled:bg-primary disabled:text-primary-content disabled:opacity-80\" :disabled=\"!valid\">Send Code<template class=\"htmx-indicator\"><span class=\"loading loading-dots loading-xs\"></span></template></button></div></form></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -83,7 +96,7 @@ func Verify(email string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-replace-url=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-swap=\"outerHTML\" hx-target=\"body\" hx-replace-url=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -99,7 +112,19 @@ func Verify(email string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <input class=\"input input-bordered w-full max-w-xs mb-6\" :class=\"fields.code.error ? &#39;input-error&#39; : &#39;&#39;\" type=\"text\" name=\"code\" placeholder=\"123456\" x-model=\"fields.code.value\"><template x-if=\"fields.code.error\"><div class=\"flex pl-1 -mt-6 text-error\" x-text=\"fields.code.message\"></div></template><div class=\"card-actions justify-end\"><button type=\"submit\" class=\"btn btn-primary disabled:opacity-95\" :disabled=\"!valid\">Verify Code<template class=\"htmx-indicator\"><span class=\"loading loading-dots loading-xs\"></span></template></button></div></form>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = component.InputWithValidation(component.InputWithValidationProps{
+			Name:        "code",
+			Typ:         "text",
+			Placeholder: "123456",
+		}).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"card-actions justify-end\"><button type=\"submit\" class=\"btn btn-primary disabled:bg-primary disabled:text-primary-content disabled:opacity-80\" :disabled=\"!valid\">Verify Code<template class=\"htmx-indicator\"><span class=\"loading loading-dots loading-xs\"></span></template></button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

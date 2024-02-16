@@ -3,43 +3,46 @@ package user
 import (
     "github.com/dfalgout/dream/view/layout"
 	  "github.com/dfalgout/dream/config"
+	"github.com/dfalgout/dream/view/component"
 )
 
 templ Login() {
   @layout.Base("Login") {
-   <div class="flex h-full justify-center items-center">
-    <div class="card w-96 bg-neutral text-neutral-content">
-     <div class="card-body items-center text-center">
-       <h2 class="card-title">Login</h2>
-       <form hx-post={config.ActionSendCode} hx-swap="outerHTML" x-data="validation({ email: 'email' })">
-         <input class="input input-bordered w-full max-w-xs mb-6" :class="fields.email.error ? 'input-error' : ''" type="email" name="email" placeholder="Email" x-model="fields.email.value" />
-         <template x-if="fields.email.error">
-           <div class="flex pl-1 -mt-6 text-error" x-text="fields.email.message"></div>
-         </template>
-          <div class="card-actions justify-end">
-            <button type="submit" class="btn btn-primary disabled:opacity-95" :disabled="!valid">
-              Send Code
-              <template class="htmx-indicator">
-                <span class="loading loading-dots loading-xs"></span>
-              </template>
-            </button>
-         </div>
-        </form>
-     </div>
-   </div>
-   </div>
+    <div class="flex h-full justify-center items-center">
+      <div class="card w-96 bg-neutral text-neutral-content">
+        <div class="card-body items-center text-center">
+          <h2 class="card-title mb-6">Login</h2>
+          <form hx-post={config.ActionSendCode} hx-swap="outerHTML" x-data="validation({ email: 'email' })">
+            @component.InputWithValidation(component.InputWithValidationProps{
+                  Name: "email",
+                  Typ: "email",
+                  Placeholder: "john@doe.com",
+                })
+            <div class="card-actions justify-end">
+              <button type="submit" class="btn btn-primary disabled:bg-primary disabled:text-primary-content disabled:opacity-80" :disabled="!valid">
+                Send Code
+                <template class="htmx-indicator">
+                  <span class="loading loading-dots loading-xs"></span>
+                </template>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   }
 }
 
 templ Verify(email string) {
-  <form hx-post={config.ActionVerifyCode} hx-replace-url={config.Onboarding} x-data="validation({ code: 'length=6' })">
+  <form hx-post={config.ActionVerifyCode} hx-swap="outerHTML" hx-target="body" hx-replace-url={config.Onboarding} x-data="validation({ code: 'length=6' })">
     <input type="hidden" name="email" value={email} />
-    <input class="input input-bordered w-full max-w-xs mb-6" :class="fields.code.error ? 'input-error' : ''" type="text" name="code" placeholder="123456" x-model="fields.code.value" />
-    <template x-if="fields.code.error">
-      <div class="flex pl-1 -mt-6 text-error" x-text="fields.code.message"></div>
-    </template>
+    @component.InputWithValidation(component.InputWithValidationProps{
+      Name: "code",
+      Typ: "text",
+      Placeholder: "123456",
+    })
     <div class="card-actions justify-end">
-      <button type="submit" class="btn btn-primary disabled:opacity-95" :disabled="!valid">
+      <button type="submit" class="btn btn-primary disabled:bg-primary disabled:text-primary-content disabled:opacity-80" :disabled="!valid">
         Verify Code
         <template class="htmx-indicator">
           <span class="loading loading-dots loading-xs"></span>

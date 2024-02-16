@@ -4,16 +4,15 @@ import (
   "fmt"
 )
 
-type InputProps struct {
+type InputWithValidationProps struct {
   Typ string
   Name string
   Placeholder string
-  Validate string
 }
 
-templ Input(props InputProps) {
-  <div>
-    <input type={props.Typ} name={props.Name} placeholder={props.Placeholder} hx-swap="innerHTML" hx-target={ fmt.Sprintf("#%s", props.Name) } />
-    <div class="text-error" id={props.Name}></div>
-  </div>
+templ InputWithValidation(props InputWithValidationProps) {
+  <input class="input input-bordered w-full max-w-xs mb-6" :class={fmt.Sprintf("fields.%s.error ? 'input-error' : ''", props.Name)} type={props.Typ} name={props.Name} placeholder={props.Placeholder} x-bind="paste" x-model={fmt.Sprintf("fields.%s.value", props.Name)} />
+  <template x-if={fmt.Sprintf("fields.%s.error", props.Name)}>
+    <div class="flex pl-1 -mt-6 text-error" x-text={fmt.Sprintf("fields.%s.message", props.Name)}></div>
+  </template>
 }
